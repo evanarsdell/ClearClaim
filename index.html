@@ -67,7 +67,6 @@
       border: none;
       cursor: pointer;
     }
-    /* Updated styling for the results box */
     #results {
       margin-top: 1rem;
       font-family: monospace;
@@ -212,8 +211,8 @@
           const data = await response.json();
           dots.resolve.classList.add('active');
 
-          // Pretty-print the JSON result
-          const pretty = JSON.stringify(JSON.parse(data.result), null, 2);
+          // FIXED LINE: this no longer double-parses JSON
+          const pretty = JSON.stringify(data.result, null, 2);
           resultsEl.textContent = pretty;
         } catch (err) {
           resultsEl.textContent = 'Error: ' + err.message;
