@@ -202,10 +202,7 @@
 
           const data = await response.json();
           dots.resolve.classList.add('active');
-          resultsEl.textContent = (data.result || '')
-            .replace(/```(?:json)?\n?/g, '')
-            .replace(/```$/, '')
-            .trim();
+          resultsEl.textContent = data.result || 'No response from model.';
         } catch (err) {
           resultsEl.textContent = 'Error: ' + err.message;
         }
