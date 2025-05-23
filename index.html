@@ -7,218 +7,170 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --light-blue: #e6f7ff;
-      --white: #ffffff;
-      --soft-gray: #f5f5f5;
-      --mint-green: #a6f9c7;
-      --text-dark: #222;
+      --light-blue:#e6f7ff;
+      --white:#ffffff;
+      --soft-gray:#f5f5f5;
+      --mint-green:#a6f9c7;
+      --text-dark:#222;
     }
-    * {
-      box-sizing: border-box;
-      font-family: 'Open Sans', sans-serif;
-      color: var(--text-dark);
-    }
-    body {
-      margin: 0;
-      padding: 0;
-      background: var(--light-blue);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-    .container {
-      width: 90%;
-      max-width: 600px;
-      background: var(--white);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      padding: 1.5rem;
-      margin: 2rem 0;
-    }
-    header {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-    header h1 {
-      margin: 0;
-      font-weight: 600;
-    }
-    .upload-section {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      align-items: center;
-      text-align: center;
-      background: var(--soft-gray);
-      padding: 1.5rem;
-      border-radius: 8px;
-    }
-    .file-input {
-      background: var(--white);
-      padding: 0.75rem;
-      border: 2px dashed var(--mint-green);
-      border-radius: 8px;
-      width: 100%;
-      cursor: pointer;
-    }
-    .file-input input {
-      width: 100%;
-      border: none;
-      cursor: pointer;
-    }
-    #results {
-      margin-top: 1rem;
-      font-family: monospace;
-      background: #f4f4f4;
-      white-space: pre-wrap;
-      padding: 1rem;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      overflow-x: auto;
-      color: #333;
-    }
-    .status-tracker {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 2rem;
-      padding: 0 0.5rem;
-    }
-    .status-step {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
-    }
-    .dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #ccc;
-      margin-bottom: 0.25rem;
-      transition: background 0.3s;
-    }
-    .dot.active {
-      background: var(--mint-green);
-    }
-    .btn {
-      display: block;
-      width: 100%;
-      margin-top: 2rem;
-      padding: 0.75rem;
-      border: none;
-      border-radius: 8px;
-      background: var(--mint-green);
-      color: var(--text-dark);
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    .btn:hover {
-      opacity: 0.9;
-    }
-    @media (max-width: 480px) {
-      .container {
-        padding: 1rem;
-      }
-      .upload-section h2 {
-        font-size: 1.1rem;
-      }
+    *{box-sizing:border-box;font-family:'Open Sans',sans-serif;color:var(--text-dark);}
+    body{margin:0;padding:0;background:var(--light-blue);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;}
+    .container{width:90%;max-width:600px;background:var(--white);border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05);padding:1.5rem;margin:2rem 0;}
+    header{text-align:center;margin-bottom:1.5rem;} header h1{margin:0;font-weight:600;}
+
+    /* Upload box */
+    .upload-section{display:flex;flex-direction:column;gap:1rem;align-items:center;text-align:center;background:var(--soft-gray);padding:1.5rem;border-radius:8px;}
+    .file-input{background:var(--white);padding:.75rem;border:2px dashed var(--mint-green);border-radius:8px;width:100%;cursor:pointer;} .file-input input{width:100%;border:none;cursor:pointer;}
+
+    /* Result cards */
+    .card{background:#f9f9f9;border-radius:8px;padding:1rem;margin-top:1rem;}
+    .card h3{margin:0 0 .5rem;font-size:1rem;font-weight:600;}
+    .card ul{margin:0;padding-left:1.2rem;}
+    .card table{width:100%;border-collapse:collapse;font-size:.9rem;}
+    .card table td{padding:.25rem .5rem;} .card table tr:nth-child(odd){background:#f0f0f0;}
+
+    /* Letter textarea & copy btn */
+    .letter-wrapper{position:relative;}
+    #letter{width:100%;min-height:150px;border:1px solid #ddd;border-radius:6px;padding:.75rem;font-family:monospace;white-space:pre-wrap;}
+    .copy-btn{position:absolute;top:8px;right:8px;font-size:.8rem;padding:.25rem .5rem;border:none;border-radius:4px;background:var(--mint-green);cursor:pointer;}
+
+    /* Status tracker */
+    .status-tracker{display:flex;justify-content:space-between;margin-top:2rem;padding:0 .5rem;}
+    .status-step{display:flex;flex-direction:column;align-items:center;flex:1;}
+    .dot{width:16px;height:16px;border-radius:50%;background:#ccc;margin-bottom:.25rem;transition:background .3s;}
+    .dot.active{background:var(--mint-green);}
+
+    .btn{display:block;width:100%;margin-top:2rem;padding:.75rem;border:none;border-radius:8px;background:var(--mint-green);color:var(--text-dark);font-weight:600;font-size:1rem;cursor:pointer;transition:opacity .2s;}
+    .btn:hover{opacity:.9;}
+
+    @media(max-width:480px){
+      .container{padding:1rem;}
+      .upload-section h2{font-size:1.1rem;}
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>ClearClaim AI</h1>
-    </header>
+    <header><h1>ClearClaim AI</h1></header>
 
     <section class="upload-section">
       <h2>Upload your bill, discover savings.</h2>
       <label class="file-input">
         <input type="file" id="billUpload" accept="application/pdf,image/*" />
       </label>
-      <div id="results">No bill uploaded yet.</div>
+      <div id="uploadStatus">No bill uploaded yet.</div>
     </section>
 
+    <!-- Dynamic results will be injected here -->
+    <div id="resultArea"></div>
+
+    <!-- Status dots -->
     <div class="status-tracker">
-      <div class="status-step">
-        <span class="dot" id="dot-upload"></span>
-        <small>Uploaded</small>
-      </div>
-      <div class="status-step">
-        <span class="dot" id="dot-analyze"></span>
-        <small>Analyzed</small>
-      </div>
-      <div class="status-step">
-        <span class="dot" id="dot-resolve"></span>
-        <small>Resolved</small>
-      </div>
+      <div class="status-step"><span class="dot" id="dot-upload"></span><small>Uploaded</small></div>
+      <div class="status-step"><span class="dot" id="dot-analyze"></span><small>Analyzed</small></div>
+      <div class="status-step"><span class="dot" id="dot-resolve"></span><small>Resolved</small></div>
     </div>
 
     <button class="btn" id="generateLetter">Generate Dispute Letter</button>
   </div>
 
   <script>
-    (() => {
-      const uploadInput = document.getElementById('billUpload');
-      const resultsEl = document.getElementById('results');
-      const dots = {
-        upload: document.getElementById('dot-upload'),
-        analyze: document.getElementById('dot-analyze'),
-        resolve: document.getElementById('dot-resolve')
+  (() => {
+    const uploadInput = document.getElementById('billUpload');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const resultArea = document.getElementById('resultArea');
+    const dots = {
+      upload : document.getElementById('dot-upload'),
+      analyze: document.getElementById('dot-analyze'),
+      resolve: document.getElementById('dot-resolve')
+    };
+
+    let base64 = '', mimeType = '';
+
+    uploadInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      dots.upload.classList.add('active');
+      uploadStatus.textContent = `Uploaded: ${file.name}`;
+      mimeType = file.type;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        base64 = reader.result.split(',')[1];
+        uploadStatus.textContent = 'File uploaded and ready.';
       };
+      reader.readAsDataURL(file);
+    });
 
-      let base64 = '';
-      let mimeType = '';
+    document.getElementById('generateLetter').addEventListener('click', async () => {
+      if (!base64 || !mimeType){
+        alert('Please upload a bill first.');
+        return;
+      }
+      dots.analyze.classList.add('active');
+      resultArea.innerHTML = '<div class="card">Analyzing…</div>';
 
-      uploadInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+      try{
+        const resp = await fetch(
+          'https://194ac1b5-d773-4da0-b82e-b910471c443c-00-3r8brauu5sxqy.picard.replit.dev/analyze-bill',
+          {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ base64, mimeType })
+          }
+        );
+        const data = await resp.json();
+        dots.resolve.classList.add('active');
+        displayResults(data.result);
+      }catch(err){
+        resultArea.innerHTML = `<div class="card">Error: ${err.message}</div>`;
+      }
+    });
 
-        dots.upload.classList.add('active');
-        resultsEl.textContent = `Uploaded: ${file.name}`;
-        mimeType = file.type;
+    function displayResults(res){
+      // Clear area
+      resultArea.innerHTML = '';
 
-        const reader = new FileReader();
-        reader.onload = function () {
-          base64 = reader.result.split(',')[1];
-          resultsEl.textContent = 'File uploaded and ready.';
-        };
-        reader.readAsDataURL(file);
+      // -------- Summary Card --------
+      const summaryCard = document.createElement('div');
+      summaryCard.className = 'card';
+      summaryCard.innerHTML = `<h3>Summary of Charges</h3><ul>${res.summary.map(s => `<li>${s}</li>`).join('')}</ul>`;
+      resultArea.appendChild(summaryCard);
+
+      // -------- Estimates Card --------
+      const estCard = document.createElement('div');
+      estCard.className = 'card';
+      estCard.innerHTML = `<h3>Typical In-Network Rates</h3>`;
+      const table = document.createElement('table');
+      Object.entries(res.regionalEstimates).forEach(([code, range])=>{
+        const row = document.createElement('tr');
+        row.innerHTML = `<td><strong>${code}</strong></td><td>${range}</td>`;
+        table.appendChild(row);
       });
+      estCard.appendChild(table);
+      resultArea.appendChild(estCard);
 
-      document.getElementById('generateLetter').addEventListener('click', async () => {
-        if (!base64 || !mimeType) {
-          alert('Please upload a bill first.');
-          return;
-        }
-
-        dots.analyze.classList.add('active');
-        resultsEl.textContent = 'Analyzing…';
-
-        try {
-          const response = await fetch(
-            'https://194ac1b5-d773-4da0-b82e-b910471c443c-00-3r8brauu5sxqy.picard.replit.dev/analyze-bill',
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ base64, mimeType })
-            }
-          );
-
-          const data = await response.json();
-          dots.resolve.classList.add('active');
-
-          // FIXED LINE: this no longer double-parses JSON
-          const pretty = JSON.stringify(data.result, null, 2);
-          resultsEl.textContent = pretty;
-        } catch (err) {
-          resultsEl.textContent = 'Error: ' + err.message;
-        }
-      });
-    })();
+      // -------- Dispute Letter Card --------
+      const letterCard = document.createElement('div');
+      letterCard.className = 'card letter-wrapper';
+      letterCard.innerHTML = `<h3>Dispute Letter</h3>`;
+      const textarea = document.createElement('textarea');
+      textarea.id = 'letter';
+      textarea.readOnly = true;
+      textarea.value = res.disputeLetter;
+      const copyBtn = document.createElement('button');
+      copyBtn.textContent = 'Copy';
+      copyBtn.className = 'copy-btn';
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(res.disputeLetter);
+        copyBtn.textContent = 'Copied!';
+        setTimeout(()=>copyBtn.textContent='Copy',1500);
+      };
+      letterCard.appendChild(textarea);
+      letterCard.appendChild(copyBtn);
+      resultArea.appendChild(letterCard);
+    }
+  })();
   </script>
 </body>
 </html>
