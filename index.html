@@ -1,164 +1,35 @@
 <!DOCTYPE html>
-<!--
-  ClearClaim AI – Bare‑bones Front End (v1.1)
-  --------------------------------------------------
-  How to run: Save this file (e.g., clearclaim.html) and open it in any modern browser or drop it into CodePen/JSFiddle.
-  Changelog:
-    • v1.1 – Wrapped JS in an IIFE to avoid global namespace collisions that caused the
-      "Can't create duplicate variable: 'billInput'" error when the script re‑evaluated.
--->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ClearClaim AI</title>
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    /* ----------------------------
-       Global Styles & Layout
-    ---------------------------- */
-    :root {
-      --light-blue: #e6f7ff;
-      --white: #ffffff;
-      --soft-gray: #f5f5f5;
-      --mint-green: #a6f9c7;
-      --text-dark: #222;
-    }
-
-    * {
-      box-sizing: border-box;
-      font-family: 'Open Sans', sans-serif;
-      color: var(--text-dark);
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background: var(--light-blue);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-
-    .container {
-      width: 90%;
-      max-width: 600px;
-      background: var(--white);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      padding: 1.5rem;
-      margin: 2rem 0;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-    header h1 {
-      margin: 0;
-      font-weight: 600;
-    }
-
-    /* Landing / Upload Section */
-    .upload-section {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      align-items: center;
-      text-align: center;
-      background: var(--soft-gray);
-      padding: 1.5rem;
-      border-radius: 8px;
-    }
-    .upload-section h2 {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
-
-    .file-input {
-      background: var(--white);
-      padding: 0.75rem;
-      border: 2px dashed var(--mint-green);
-      border-radius: 8px;
-      width: 100%;
-      cursor: pointer;
-    }
-    .file-input input {
-      width: 100%;
-      border: none;
-      cursor: pointer;
-    }
-
-    /* Results Placeholder */
-    #results {
-      margin-top: 1rem;
-      font-style: italic;
-      color: #666;
-    }
-
-    /* Status Tracker */
-    .status-tracker {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 2rem;
-      padding: 0 0.5rem;
-    }
-    .status-step {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
-    }
-    .dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #ccc;
-      margin-bottom: 0.25rem;
-      transition: background 0.3s;
-    }
-    .dot.active {
-      background: var(--mint-green);
-    }
-
-    /* Button */
-    .btn {
-      display: block;
-      width: 100%;
-      margin-top: 2rem;
-      padding: 0.75rem;
-      border: none;
-      border-radius: 8px;
-      background: var(--mint-green);
-      color: var(--text-dark);
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    .btn:hover {
-      opacity: 0.9;
-    }
-
-    /* Responsive fine‑tuning */
-    @media (max-width: 480px) {
-      .container {
-        padding: 1rem;
-      }
-      .upload-section h2 {
-        font-size: 1.1rem;
-      }
-    }
+    /* ————— existing styles unchanged ————— */
+    :root { --light-blue:#e6f7ff; --white:#ffffff; --soft-gray:#f5f5f5;
+            --mint-green:#a6f9c7; --text-dark:#222; }
+    *{box-sizing:border-box;font-family:'Open Sans',sans-serif;color:var(--text-dark);}
+    body{margin:0;padding:0;background:var(--light-blue);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;}
+    .container{width:90%;max-width:600px;background:var(--white);border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05);padding:1.5rem;margin:2rem 0;}
+    header{text-align:center;margin-bottom:1.5rem;} header h1{margin:0;font-weight:600;}
+    .upload-section{display:flex;flex-direction:column;gap:1rem;align-items:center;text-align:center;background:var(--soft-gray);padding:1.5rem;border-radius:8px;}
+    .upload-section h2{margin:0;font-size:1.25rem;font-weight:600;}
+    .file-input{background:var(--white);padding:.75rem;border:2px dashed var(--mint-green);border-radius:8px;width:100%;cursor:pointer;}
+    .file-input input{width:100%;border:none;cursor:pointer;}
+    #results{margin-top:1rem;font-style:italic;color:#666;}
+    .status-tracker{display:flex;justify-content:space-between;margin-top:2rem;padding:0 .5rem;}
+    .status-step{display:flex;flex-direction:column;align-items:center;flex:1;}
+    .dot{width:16px;height:16px;border-radius:50%;background:#ccc;margin-bottom:.25rem;transition:background .3s;}
+    .dot.active{background:var(--mint-green);}
+    .btn{display:block;width:100%;margin-top:2rem;padding:.75rem;border:none;border-radius:8px;background:var(--mint-green);color:var(--text-dark);font-weight:600;font-size:1rem;cursor:pointer;transition:opacity .2s;}
+    .btn:hover{opacity:.9;}
+    @media (max-width:480px){.container{padding:1rem;} .upload-section h2{font-size:1.1rem;}}
   </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>ClearClaim AI</h1>
-    </header>
+    <header><h1>ClearClaim AI</h1></header>
 
     <section class="upload-section">
       <h2>Upload your bill, discover savings.</h2>
@@ -168,70 +39,68 @@
       <div id="results">No bill uploaded yet.</div>
     </section>
 
-    <!-- Status Tracker -->
     <div class="status-tracker">
-      <div class="status-step">
-        <span class="dot" id="dot-upload"></span>
-        <small>Uploaded</small>
-      </div>
-      <div class="status-step">
-        <span class="dot" id="dot-analyze"></span>
-        <small>Analyzed</small>
-      </div>
-      <div class="status-step">
-        <span class="dot" id="dot-resolve"></span>
-        <small>Resolved</small>
-      </div>
+      <div class="status-step"><span class="dot" id="dot-upload"></span><small>Uploaded</small></div>
+      <div class="status-step"><span class="dot" id="dot-analyze"></span><small>Analyzed</small></div>
+      <div class="status-step"><span class="dot" id="dot-resolve"></span><small>Resolved</small></div>
     </div>
 
     <button class="btn" id="generateLetter">Generate Dispute Letter</button>
   </div>
 
   <script>
-    /* ------------------------------------------------------------
-       Placeholder Logic (Vanilla JS)
-       Wrapped in an IIFE to keep variables local and prevent
-       duplicate‑declaration errors when the script is evaluated
-       more than once (e.g., in hot‑reload environments like CodePen).
-    ------------------------------------------------------------ */
     (() => {
       const uploadInput = document.getElementById('billUpload');
-      const resultsEl = document.getElementById('results');
+      const resultsEl   = document.getElementById('results');
+      const btn         = document.getElementById('generateLetter');
       const dots = {
-        upload: document.getElementById('dot-upload'),
+        upload : document.getElementById('dot-upload'),
         analyze: document.getElementById('dot-analyze'),
         resolve: document.getElementById('dot-resolve')
       };
 
-      uploadInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Update UI
-        resultsEl.textContent = `Uploaded: ${file.name}`;
-        dots.upload.classList.add('active');
-
-        /*
-          TODO: Insert OCR + AI pipeline here.
-                1. Send file to backend / OCR service.
-                2. Analyze charges using LLM.
-                3. Update UI with findings and progress.
-        */
-
-        // Simulate analysis & resolution steps for demo purposes
-        setTimeout(() => {
-          dots.analyze.classList.add('active');
-          resultsEl.textContent = 'Analysis complete – potential savings found!';
-        }, 1500);
-
-        setTimeout(() => {
-          dots.resolve.classList.add('active');
-          resultsEl.textContent += ' ✅';
-        }, 3000);
+      // helper: turn ArrayBuffer to Base64
+      const toBase64 = file => new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result.split(',')[1]);
+        reader.onerror = e => rej(e);
+        reader.readAsDataURL(file);
       });
 
-      document.getElementById('generateLetter').addEventListener('click', () => {
-        alert('Coming soon.');
+      btn.addEventListener('click', async () => {
+        const file = uploadInput.files[0];
+        if (!file) { alert('Please upload a bill first.'); return; }
+
+        // UI: mark uploaded
+        dots.upload.classList.add('active');
+        resultsEl.textContent = 'Uploading…';
+
+        try {
+          // convert file → Base64
+          const base64   = await toBase64(file);
+          const mimeType = file.type || 'application/octet-stream';
+
+          // UI: mark analyzing
+          dots.analyze.classList.add('active');
+          resultsEl.textContent = 'Analyzing with AI…';
+
+          // call your backend
+          const resp = await fetch('https://clearclaim-backend.YOUR_REPL_URL.repl.co/analyze-bill', {
+            method : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body   : JSON.stringify({ base64, mimeType })
+          });
+
+          const data = await resp.json();
+          if (resp.ok && data.result) {
+            dots.resolve.classList.add('active');
+            resultsEl.textContent = data.result;
+          } else {
+            throw new Error(data.error || 'Unexpected response from server');
+          }
+        } catch (err) {
+          resultsEl.textContent = '❌ ' + err.message;
+        }
       });
     })();
   </script>
