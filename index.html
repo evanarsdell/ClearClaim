@@ -67,11 +67,17 @@
       border: none;
       cursor: pointer;
     }
+    /* Updated styling for the results box */
     #results {
       margin-top: 1rem;
-      font-style: italic;
-      color: #666;
+      font-family: monospace;
+      background: #f4f4f4;
       white-space: pre-wrap;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      color: #333;
     }
     .status-tracker {
       display: flex;
@@ -178,7 +184,7 @@
 
         const reader = new FileReader();
         reader.onload = function () {
-          base64 = reader.result.split(',')[1]; // strip "data:<type>;base64,"
+          base64 = reader.result.split(',')[1];
           resultsEl.textContent = 'File uploaded and ready.';
         };
         reader.readAsDataURL(file);
@@ -194,15 +200,21 @@
         resultsEl.textContent = 'Analyzing…';
 
         try {
-          const response = await fetch('https://194ac1b5-d773-4da0-b82e-b910471c443c-00-3r8brauu5sxqy.picard.replit.dev/analyze-bill', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ base64, mimeType })
-          });
+          const response = await fetch(
+            'https://194ac1b5-d773-4da0-b82e-b910471c443c-00-3r8brauu5sxqy.picard.replit.dev/analyze-bill',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ base64, mimeType })
+            }
+          );
 
           const data = await response.json();
           dots.resolve.classList.add('active');
-          resultsEl.textContent = data.result || 'No response from model.';
+
+          // Pretty-print the JSON result
+          const pretty = JSON.stringify(JSON.parse(data.result), null, 2);
+          resultsEl.textContent = pretty;
         } catch (err) {
           resultsEl.textContent = 'Error: ' + err.message;
         }
