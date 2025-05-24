@@ -80,13 +80,13 @@
     dots.analyze.classList.add('active'); resultArea.innerHTML='<div class="card">Analyzing…</div>';
 
     try{
-      const r=await fetch('/analyze-bill',{      /* ← endpoint unchanged if served together */
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ base64, mimeType })
-      });
-      const data=await r.json(); dots.resolve.classList.add('active');
-      renderResults(data.result || {});
-    }catch(err){ resultArea.innerHTML=`<div class="card">Error: ${err.message}</div>`; }
+  const r=await fetch('https://194ac1b5-d773-4da0-b82e-b910471c443c-00-3r8brauu5sxqy.picard.replit.dev/analyze-bill',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ base64, mimeType })
+  });
+  const data=await r.json(); dots.resolve.classList.add('active');
+  renderResults(data.result || {});
+}catch(err){ resultArea.innerHTML=`<div class="card">Error: ${err.message}</div>`; }
   });
 
   /* ---------- Render ---------- */
