@@ -6,6 +6,7 @@
   <title>ClearClaim AI</title>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
+    /* ↓ unchanged global + card styles */
     :root{--light-blue:#e6f7ff;--white:#fff;--soft-gray:#f5f5f5;--mint-green:#a6f9c7;--text-dark:#222}
     *{box-sizing:border-box;font-family:'Open Sans',sans-serif;color:var(--text-dark)}
     body{margin:0;padding:0;background:var(--light-blue);display:flex;justify-content:center;align-items:flex-start;min-height:100vh}
@@ -16,6 +17,9 @@
     .file-input input{width:100%;border:none;cursor:pointer}
     .card{background:#f9f9f9;border-radius:8px;padding:1rem;margin-top:1rem}
     .card h3{margin:0 0 .5rem;font-size:1rem;font-weight:600}
+    .card table{width:100%;border-collapse:collapse;font-size:.9rem}
+    .card table th,.card table td{padding:.4rem .5rem;text-align:left}
+    .card table tr:nth-child(odd){background:#f0f0f0}
     .letter-wrapper{position:relative}
     #letter{width:100%;min-height:150px;border:1px solid #ddd;border-radius:6px;padding:.75rem;font-family:monospace;white-space:pre-wrap}
     .copy-btn{position:absolute;top:8px;right:8px;font-size:.8rem;padding:.25rem .5rem;border:none;border-radius:4px;background:var(--mint-green);cursor:pointer}
@@ -23,14 +27,8 @@
     .status-step{display:flex;flex-direction:column;align-items:center;flex:1}
     .dot{width:16px;height:16px;border-radius:50%;background:#ccc;margin-bottom:.25rem;transition:background .3s}
     .dot.active{background:var(--mint-green)}
-    .btn{display:block;width:100%;margin-top:2rem;padding:.75rem;border:none;border-radius:8px;background:var(--mint-green);font-weight:600;font-size:1rem;cursor:pointer;transition:opacity .2s}
+    .btn{display:block;width:100%;margin-top:2rem;padding:.75rem;border:none;border-radius:8px;background:var(--mint-green);color:var(--text-dark);font-weight:600;font-size:1rem;cursor:pointer;transition:opacity .2s}
     .btn:hover{opacity:.9}
-
-    /* NEW: nice looking table */
-    .table-wrapper{overflow-x:auto}
-    table{border-collapse:collapse;width:100%}
-    th,td{border:1px solid #ddd;padding:.5rem;text-align:left;font-size:.85rem}
-    th{background:#e6f7ff;font-weight:600;white-space:nowrap}
   </style>
 </head>
 <body>
@@ -82,64 +80,49 @@
     dots.analyze.classList.add('active'); resultArea.innerHTML='<div class="card">Analyzing…</div>';
 
     try{
-      const r=await fetch('/analyze-bill',{   /* change to /analyze-bill when served from same origin */
+      const r=await fetch('/analyze-bill',{      /* ← endpoint unchanged if served together */
         method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({ base64, mimeType })
       });
       const data=await r.json(); dots.resolve.classList.add('active');
-      renderResults(data);
-    }catch(err){
-      resultArea.innerHTML=`<div class="card">Error: ${err.message}</div>`;
-    }
+      renderResults(data.result || {});
+    }catch(err){ resultArea.innerHTML=`<div class="card">Error: ${err.message}</div>`; }
   });
 
   /* ---------- Render ---------- */
   function renderResults(res){
     resultArea.innerHTML='';
 
-    /* ===== Services table ===== */
-    const tblCard = document.createElement('div'); tblCard.className='card';
-    tblCard.innerHTML = '<h3>Itemised Charges&nbsp;vs&nbsp;Benchmarks</h3>';
-
-    const wrapper = document.createElement('div'); wrapper.className='table-wrapper';
-    const tbl = document.createElement('table');
-
-    tbl.innerHTML =
+    /* Services card */
+    const svcCard=document.createElement('div'); svcCard.className='card';
+    svcCard.innerHTML='<h3>Itemized Services</h3>';
+    const tbl=document.createElement('table');
+    tbl.innerHTML=
       '<thead><tr>' +
-      '<th>Description</th><th>CPT</th><th>Charge</th>' +
-      '<th>OON&nbsp;Benchmark</th><th>INN&nbsp;Benchmark</th>' +
-      '<th>Δ&nbsp;OON</th><th>Δ&nbsp;INN</th>' +
+      '<th>Description</th><th>CPT</th><th>Billed</th>' +
+      '<th>Benchmark&nbsp;OON</th><th>Benchmark&nbsp;INN</th>' +
+      '<th>Over&nbsp;OON</th><th>Over&nbsp;INN</th>' +
       '</tr></thead><tbody></tbody>';
+    (Array.isArray(res.services)?res.services:[]).forEach(svc=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=
+        `<td>${svc.service_description||'-'}</td>` +
+        `<td>${svc.cpt_code||'-'}</td>` +
+        `<td>$${svc.charge?.toLocaleString()||'-'}</td>` +
+        `<td>$${svc.benchmark_out_of_network?.toLocaleString()||'-'}</td>` +
+        `<td>$${svc.benchmark_in_network?.toLocaleString()||'-'}</td>` +
+        `<td>$${svc.overcharged_by_out_of_network?.toLocaleString()||'-'}</td>` +
+        `<td>$${svc.overcharged_by_in_network?.toLocaleString()||'-'}</td>`;
+      tbl.querySelector('tbody').appendChild(tr);
+    });
+    svcCard.appendChild(tbl); resultArea.appendChild(svcCard);
 
-    const tbody = tbl.querySelector('tbody');
-
-    if (Array.isArray(res.services) && res.services.length) {
-      res.services.forEach(svc => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${svc.service_description || '-'}</td>
-          <td>${svc.cpt_code || '-'}</td>
-          <td>$${svc.charge ?? '-'}</td>
-          <td>$${svc.benchmark_out_of_network ?? '-'}</td>
-          <td>$${svc.benchmark_in_network ?? '-'}</td>
-          <td>$${svc.overcharged_by_out_of_network ?? '-'}</td>
-          <td>$${svc.overcharged_by_in_network ?? '-'}</td>`;
-        tbody.appendChild(tr);
-      });
-    } else {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">No line-items found.</td></tr>';
-    }
-
-    wrapper.appendChild(tbl); tblCard.appendChild(wrapper); resultArea.appendChild(tblCard);
-
-    /* ===== Dispute letter ===== */
+    /* Letter card */
     const lettCard=document.createElement('div'); lettCard.className='card letter-wrapper';
     lettCard.innerHTML='<h3>Dispute Letter</h3>';
-
     const ta=document.createElement('textarea'); ta.id='letter'; ta.readOnly=true; ta.value=res.disputeLetter || '';
     const copy=document.createElement('button'); copy.className='copy-btn'; copy.textContent='Copy';
     copy.onclick=()=>{ navigator.clipboard.writeText(ta.value); copy.textContent='Copied!'; setTimeout(()=>copy.textContent='Copy',1500);};
-
     lettCard.appendChild(ta); lettCard.appendChild(copy); resultArea.appendChild(lettCard);
   }
 })();
