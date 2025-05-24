@@ -89,37 +89,59 @@
     }catch(err){ resultArea.innerHTML=`<div class="card">Error: ${err.message}</div>`; }
   });
 
-  /* ---------- Render ---------- */
-  function renderResults(res){
-    resultArea.innerHTML='';
+<!-- inside <script> … (replace only renderResults) -->
+function renderResults(res) {
+  resultArea.innerHTML = '';
 
-    /* Summary card */
-    const sumCard=document.createElement('div'); sumCard.className='card';
-    const listItems = (Array.isArray(res.summary) ? res.summary : []).map(item=>{
-      if(typeof item==='string') return `<li>${item}</li>`;
-      // fallback if object
-      return `<li>${item.service_description || 'Service'} (CPT ${item.cpt_code||'?'}) – $${item.charge||'?'}</li>`;
-    }).join('');
-    sumCard.innerHTML=`<h3>Summary of Charges</h3><ul>${listItems}</ul>`;
-    resultArea.appendChild(sumCard);
+  /* ===== Services table ===== */
+  const svcCard = document.createElement('div');
+  svcCard.className = 'card';
+  svcCard.innerHTML = '<h3>Itemised Charges vs Benchmarks</h3>';
 
-    /* Estimates card */
-    const estCard=document.createElement('div'); estCard.className='card';
-    estCard.innerHTML='<h3>Typical In-Network Rates</h3>';
-    const tbl=document.createElement('table');
-    Object.entries(res.regionalEstimates||{}).forEach(([code,range])=>{
-      const tr=document.createElement('tr'); tr.innerHTML=`<td><strong>${code}</strong></td><td>${range}</td>`; tbl.appendChild(tr);
-    });
-    estCard.appendChild(tbl); resultArea.appendChild(estCard);
+  const tbl = document.createElement('table');
+  tbl.innerHTML =
+    '<tr><th>Description</th><th>CPT</th><th>Charge</th>' +
+    '<th>OON&nbsp;Bench.</th><th>INN&nbsp;Bench.</th>' +
+    '<th>Δ&nbsp;OON</th><th>Δ&nbsp;INN</th></tr>';
 
-    /* Letter card */
-    const lettCard=document.createElement('div'); lettCard.className='card letter-wrapper';
-    lettCard.innerHTML='<h3>Dispute Letter</h3>';
-    const ta=document.createElement('textarea'); ta.id='letter'; ta.readOnly=true; ta.value=res.disputeLetter || '';
-    const copy=document.createElement('button'); copy.className='copy-btn'; copy.textContent='Copy';
-    copy.onclick=()=>{ navigator.clipboard.writeText(ta.value); copy.textContent='Copied!'; setTimeout(()=>copy.textContent='Copy',1500);};
-    lettCard.appendChild(ta); lettCard.appendChild(copy); resultArea.appendChild(lettCard);
-  }
+  (res.services || []).forEach(svc => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${svc.service_description || '-'}</td>
+      <td>${svc.cpt_code || '-'}</td>
+      <td>$${svc.charge ?? '-'}</td>
+      <td>$${svc.benchmark_out_of_network ?? '-'}</td>
+      <td>$${svc.benchmark_in_network ?? '-'}</td>
+      <td>$${svc.overcharged_by_out_of_network ?? '-'}</td>
+      <td>$${svc.overcharged_by_in_network ?? '-'}</td>`;
+    tbl.appendChild(tr);
+  });
+  svcCard.appendChild(tbl);
+  resultArea.appendChild(svcCard);
+
+  /* ===== Dispute letter ===== */
+  const lettCard = document.createElement('div');
+  lettCard.className = 'card letter-wrapper';
+  lettCard.innerHTML = '<h3>Dispute Letter</h3>';
+
+  const ta = document.createElement('textarea');
+  ta.id = 'letter';
+  ta.readOnly = true;
+  ta.value = res.disputeLetter || '';
+
+  const copy = document.createElement('button');
+  copy.className = 'copy-btn';
+  copy.textContent = 'Copy';
+  copy.onclick = () => {
+    navigator.clipboard.writeText(ta.value);
+    copy.textContent = 'Copied!';
+    setTimeout(() => (copy.textContent = 'Copy'), 1500);
+  };
+
+  lettCard.appendChild(ta);
+  lettCard.appendChild(copy);
+  resultArea.appendChild(lettCard);
+}
 })();
 </script>
 </body>
